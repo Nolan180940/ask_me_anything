@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>树洞信箱 | 匿名倾诉与问答</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #5d5fef;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6c757d;
+      background: #f8f9fa;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      margin-right: 8px;
+    }
+
+    .tab.active {
+      background: #5d5fef;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    button {
+      background: #5d5fef;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #4a4bcd;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f1f3f5;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .message-content {
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .reply {
+      margin-top: 12px;
+      padding: 12px;
+      background: #e8f5e8;
+      border-radius: 8px;
+      font-style: italic;
+    }
+
+    .reply-input {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .reply-input input {
+      flex: 1;
+    }
+
+    .pending {
+      opacity: 0.6;
+      border-left: 4px solid #ffc107;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+
+    .btn-approve {
+      background: #28a745;
+    }
+
+    .btn-reject {
+      background: #dc3545;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📬 树洞信箱</h1>
+      <p class="subtitle">匿名倾诉，温暖回应 | 你可以提问，也可以分享心事</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="ask">向我提问</button>
+      <button class="tab" data-tab="confession">匿名倾诉</button>
+      <button class="tab" data-tab="admin">审核管理</button>
+    </div>
+
+    <!-- 提问表单 -->
+    <div id="ask" class="tab-content active">
+      <div class="card">
+        <h2>向我提问</h2>
+        <p>有什么想问我的？匿名发送，我会认真回复 ❤️</p>
+        <div class="form-group">
+          <label for="question">你的问题</label>
+          <textarea id="question" placeholder="比如：你是怎么坚持学习编程的？"></textarea>
+        </div>
+        <button id="submitQuestion">发送提问</button>
+      </div>
+    </div>
+
+    <!-- 倾诉表单 -->
+    <div id="confession" class="tab-content">
+      <div class="card">
+        <h2>匿名倾诉</h2>
+        <p>把心事说给树洞听，这里只有理解和温暖</p>
+        <div class="form-group">
+          <label for="confessionText">想说的话</label>
+          <textarea id="confessionText" placeholder="比如：最近压力好大，感觉快要撑不住了..."></textarea>
+        </div>
+        <button id="submitConfession">投递心事</button>
+      </div>
+    </div>
+
+    <!-- 审核管理 -->
+    <div id="admin" class="tab-content">
+      <div class="card">
+        <h2>待审核内容</h2>
+        <div id="pendingList">
+          <p>暂无待审核内容</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>已发布内容</h2>
+        <div id="approvedList">
+          <p>暂无已发布内容</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 已发布消息列表 -->
+    <div id="messages" class="tab-content">
+      <div class="card">
+        <h2>大家的留言</h2>
+        <div id="messageList">
+          <p>还没有收到留言，快来提问或倾诉吧～</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>树洞信箱 | 匿名交流，彼此温暖 ❤️</p>
+      <p>所有内容均经过审核，恶意信息将被过滤</p>
+    </footer>
+  </div>
+
+  <script>
+    // 模拟数据存储
+    let pendingItems = [];
+    let approvedItems = [];
+    let replies = {};
+
+    // 切换标签页
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        
+        if (tab.dataset.tab === 'messages') {
+          renderMessages();
+        }
+      });
+    });
+
+    // 提交提问
+    document.getElementById('submitQuestion').addEventListener('click', () => {
+      const text = document.getElementById('question').value.trim();
+      if (text) {
+        pendingItems.push({
+          id: Date.now(),
+          type: 'question',
+          content: text,
+          timestamp: new Date()
+        });
+        document.getElementById('question').value = '';
+        alert('提问已提交，等待审核后显示');
+        updatePendingList();
+      }
+    });
+
+    // 提交倾诉
+    document.getElementById('submitConfession').addEventListener('click', () => {
+      const text = document.getElementById('confessionText').value.trim();
+      if (text) {
+        pendingItems.push({
+          id: Date.now(),
+          type: 'confession',
+          content: text,
+          timestamp: new Date()
+        });
+        document.getElementById('confessionText').value = '';
+        alert('心事已投递，等待审核后显示');
+        updatePendingList();
+      }
+    });
+
+    // 更新待审核列表
+    function updatePendingList() {
+      const list = document.getElementById('pendingList');
+      if (pendingItems.length === 0) {
+        list.innerHTML = '<p>暂无待审核内容</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      pendingItems.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'message pending';
+        itemEl.innerHTML = `
+          <div class="message-content">
+            <strong>${item.type === 'question' ? '提问' : '倾诉'}:</strong>
+            ${item.content}
+          </div>
+          <div class="actions">
+            <button class="btn-small btn-approve" data-id="${item.id}">通过</button>
+            <button class="btn-small btn-reject" data-id="${item.id}">拒绝</button>
+          </div>
+        `;
+        list.appendChild(itemEl);
+      });
+
+      // 绑定审核事件
+      document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', approveItem);
+      });
+
+      document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', rejectItem);
+      });
+    }
+
+    // 通过审核
+    function approveItem(e) {
+      const id = Number(e.target.dataset.id);
+      const index = pendingItems.findIndex(item => item.id === id);
+      if (index !== -1) {
+        const item = pendingItems.splice(index, 1)[0];
+        approvedItems.push(item);
+        updatePendingList();
+        updateApprovedList();
+        renderMessages();
+      }
+    }
+
+    // 拒绝审核
+    function rejectItem(e) {
+      const id = Number(e.target.dataset.id);
+      pendingItems = pendingItems.filter(item => item.id !== id);
+      updatePendingList();
+    }
+
+    // 更新已通过列表
+    function updateApprovedList() {
+      const list = document.getElementById('approvedList');
+      if (approvedItems.length === 0) {
+        list.innerHTML = '<p>暂无已发布内容</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      approvedItems.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'message';
+        const replyHtml = replies[item.id] ? 
+          `<div class="reply">回复：${replies[item.id]}</div>` : 
+          `<div class="reply-input">
+            <input type="text" placeholder="回复这条留言..." data-for="${item.id}">
+            <button class="btn-small" onclick="addReply(${item.id})">回复</button>
+          </div>`;
+
+        itemEl.innerHTML = `
+          <div class="message-content">
+            <strong>${item.type === 'question' ? '提问' : '倾诉'}:</strong>
+            ${item.content}
+          </div>
+          ${replyHtml}
+        `;
+        list.appendChild(itemEl);
+      });
+    }
+
+    // 添加回复
+    window.addReply = function(id) {
+      const input = document.querySelector(`input[data-for="${id}"]`);
+      const value = input.value.trim();
+      if (value) {
+        replies[id] = value;
+        input.value = '';
+        updateApprovedList();
+        renderMessages();
+      }
+    };
+
+    // 渲染消息列表
+    function renderMessages() {
+      const list = document.getElementById('messageList');
+      if (approvedItems.length === 0) {
+        list.innerHTML = '<p>还没有收到留言，快来提问或倾诉吧～</p>';
+        return;
+      }
+
+      list.innerHTML = '';
+      approvedItems.forEach(item => {
+        const messageEl = document.createElement('div');
+        messageEl.className = 'message';
+        messageEl.innerHTML = `
+          <div class="message-content">${item.content}</div>
+          ${replies[item.id] ? `<div class="reply">回复：${replies[item.id]}</div>` : ''}
+        `;
+        list.appendChild(messageEl);
+      });
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 添加示例数据（仅用于演示）
+      if (pendingItems.length === 0 && approvedItems.length === 0) {
+        approvedItems.push({
+          id: 1,
+          type: 'question',
+          content: '你是怎么保持积极心态的？',
+          timestamp: new Date()
+        });
+        replies[1] = '每天记录三件开心的小事，慢慢就会发现生活其实很美好~';
+
+        approvedItems.push({
+          id: 2,
+          type: 'confession',
+          content: '最近工作压力好大，感觉快要崩溃了...',
+          timestamp: new Date()
+        });
+        replies[2] = '抱抱你，压力大的时候记得停下来休息，你已经做得很好了';
+
+        updateApprovedList();
+        renderMessages();
+      }
+    });
+  </script>
+</body>
+</html>
